@@ -49,23 +49,25 @@ const totale = document.querySelector('#totale');
 const giocati = document.querySelector('#giocati');
 const daGiocare = document.querySelector('#daGiocare');
 const progressBar = document.querySelector('#progressBar');
+const percentualeTesto = document.querySelector('#percentualeTesto');
+const cercaInput = document.querySelector('#ricerca');
+const notifica = document.querySelector('#notifica');
+const formGioco = document.querySelector('#formGioco');
+const erroreForm = document.querySelector('#errorForm');
 
 render();
 
-/* RENDER()
-   Una sola funzione che ridipinge la lista. A ogni chiamata:
-   1) parte dall'array completo,
-   2) filtra,
-   3) ordina,
-   4) svuota il container DOM,
-   5) ricrea gli elementi DOM per gli oggetti risultanti.
-   Aggiorna anche conteggi e statistiche.
-   Salva lo stato in localStorage in fondo a render() (cerca tu come funziona).
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-aggiungi.addEventListener('submit', (event) => {
+formGioco.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (
+        titoloInput.value.trim() === '' ||
+        produttoreInput.value.trim() === '' ||
+        genereInput.value.trim() === ''
+    ) {
+        erroreForm.textContent = 'Compila tutti i campi!';
+        return;
+    }
+    erroreForm.textContent = '';
     const nuovoGioco = {
         titolo: titoloInput.value,
         produttore: produttoreInput.value,
@@ -73,12 +75,14 @@ aggiungi.addEventListener('submit', (event) => {
         stato: statoInput.value
     };
     giochi.push(nuovoGioco);
-    titoloInput.value = '',
-    produttoreInput.value = '',
-    genereInput.value = '',
-    statoInput.value = 'Nuovo gioco'
+    mostraNotifica('Gioco aggiunto!');
+    titoloInput.value = '';
+    produttoreInput.value = '';
+    genereInput.value = '';
+    statoInput.value = 'Nuovo gioco';
     render();
 });
+
 
 filtroStato.addEventListener('change', () => {
     render();
@@ -90,15 +94,18 @@ filtroOrdine.addEventListener('change', () => {
 
 darkModeBtn.addEventListener('click', () => {
     document.body.classList.toggle('darkMode');
-})
+});
+
+cercaInput.addEventListener('input', () => {
+    render();
+});
 
 function render() {
     lista.textContent = '';
     const giochiFiltrati = giochi.filter((gioco) => {
-        if (filtroStato.value === 'Tutti') {
-            return true;
-        }
-        return gioco.stato === filtroStato.value;
+        const matchStato = filtroStato.value === 'Tutti' || gioco.stato === filtroStato.value;
+        const matchRicerca = gioco.titolo.toLowerCase().includes(cercaInput.value.toLowerCase()) || gioco.produttore.toLowerCase().includes(cercaInput.value.toLowerCase());
+        return matchStato && matchRicerca;
     });
     if (filtroOrdine.value === 'a-z') {
         giochiFiltrati.sort((a, b) => {
@@ -121,96 +128,118 @@ function render() {
     const giochiGiocati = giochi.filter((gioco) => {
         return gioco.stato === 'Giocato';
     });
+    giocati.textContent = giochiGiocati.length;
     const giochiDaGiocare = giochi.filter((gioco) => {
         return gioco.stato === 'Da giocare';
     });
     daGiocare.textContent = giochiDaGiocare.length;
-giochiFiltrati.forEach((gioco) => {
-    const card = document.createElement('div');
-    card.classList.add('card');
-    const titolo = document.createElement('h3');
-    titolo.textContent = gioco.titolo;
-    const sottoTitolo = document.createElement('p');
-    sottoTitolo.textContent = `${gioco.produttore} - ${gioco.genere}`;
-    const badge = document.createElement('span');
-    badge.textContent = gioco.stato;
-    if (gioco.stato === 'Giocato') {
-        badge.classList.add('giocato')
-    } else if (gioco.stato === 'Da giocare') {
-        badge.classList.add('daGiocare');
-    } else {
-        badge.classList.add('nuovoGioco');
-    }
-    //bottoni
-    const statoGioco = document.createElement('button');
-    statoGioco.textContent = gioco.stato;
-    statoGioco.addEventListener('click', () => {
-        if (gioco.stato === 'Da giocare') {
-            gioco.stato = 'Giocato';
+    const totaleGiochi = giochi.length;
+
+    const tot = giochi.length;
+    const giocatiTot = giochi.filter((gioco) => {
+        return gioco.stato === 'Giocato';
+    }).length;
+    const percentuale = tot === 0 ? 0 : Math.round((giocatiTot / tot) * 100);
+    progressBar.style.width = percentuale + '%';
+    percentualeTesto.textContent = percentuale + '%';
+    giochiFiltrati.forEach((gioco) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        const titolo = document.createElement('h3');
+        titolo.textContent = gioco.titolo;
+        const sottoTitolo = document.createElement('p');
+        sottoTitolo.textContent = `${gioco.produttore} - ${gioco.genere}`;
+        const badge = document.createElement('span');
+        badge.textContent = gioco.stato;
+        if (gioco.stato === 'Giocato') {
+            badge.classList.add('giocato')
+        } else if (gioco.stato === 'Da giocare') {
+            badge.classList.add('daGiocare');
         } else {
-            gioco.stato = 'Da giocare';
+            badge.classList.add('nuovoGioco');
         }
-        render();
-    });
-    statoGioco.classList.add('statoGioco')
-    const modifica = document.createElement('button');
-    modifica.textContent = 'Modifica';
-    modifica.classList.add('modificaBtn');
-    modifica.addEventListener('click', () => {
-        const inputTitolo = document.createElement('input');
-        inputTitolo.value = gioco.titolo;
-        const inputSottoTitolo = document.createElement('input');
-        inputSottoTitolo.value = `${gioco.produttore} - ${gioco.genere}`;
-        inputTitolo.classList.add('inputModifica');
-        inputSottoTitolo.classList.add('inputModificaDue');
-        card.replaceChild(inputTitolo, titolo);
-        card.replaceChild(inputSottoTitolo, sottoTitolo);
-        inputTitolo.addEventListener('blur', () => {
-            gioco.titolo = inputTitolo.value;
-        });
-        inputTitolo.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                gioco.titolo = inputTitolo.value;
+        //bottoni
+        const statoGioco = document.createElement('button');
+        statoGioco.textContent = gioco.stato;
+        statoGioco.addEventListener('click', () => {
+            if (gioco.stato === 'Da giocare') {
+                gioco.stato = 'Giocato';
+            } else {
+                gioco.stato = 'Da giocare';
             }
-        });
-        inputSottoTitolo.addEventListener('blur', () => {
-            const parti = inputSottoTitolo.value.split('-');
-            gioco.produttore = parti[0].trim();
-            gioco.genere = parti[1].trim();
             render();
-        })
-        inputSottoTitolo.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
+            mostraNotifica('Stato aggiornato!');
+        });
+        statoGioco.classList.add('statoGioco')
+        const modifica = document.createElement('button');
+        modifica.textContent = 'Modifica';
+        modifica.classList.add('modificaBtn');
+        modifica.addEventListener('click', () => {
+            const inputTitolo = document.createElement('input');
+            inputTitolo.value = gioco.titolo;
+            const inputSottoTitolo = document.createElement('input');
+            inputSottoTitolo.value = `${gioco.produttore} - ${gioco.genere}`;
+            inputTitolo.classList.add('inputModifica');
+            inputSottoTitolo.classList.add('inputModificaDue');
+            card.replaceChild(inputTitolo, titolo);
+            card.replaceChild(inputSottoTitolo, sottoTitolo);
+            inputTitolo.addEventListener('blur', () => {
+                gioco.titolo = inputTitolo.value;
+            });
+            inputTitolo.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    gioco.titolo = inputTitolo.value;
+                }
+            });
+            inputSottoTitolo.addEventListener('blur', () => {
                 const parti = inputSottoTitolo.value.split('-');
                 gioco.produttore = parti[0].trim();
                 gioco.genere = parti[1].trim();
                 render();
-            }
+            })
+            inputSottoTitolo.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const parti = inputSottoTitolo.value.split('-');
+                    gioco.produttore = parti[0].trim();
+                    gioco.genere = parti[1].trim();
+                    render();
+                }
+            });
+            inputTitolo.focus();
+            mostraNotifica('Modifica effettuata!');
+        })
+        const elimina = document.createElement('button');
+        elimina.textContent = 'Elimina';
+        elimina.classList.add('eliminaBtn');
+        elimina.addEventListener('click', () => {
+            const btnElimina = giochi.indexOf(gioco);
+            giochi.splice(btnElimina, 1);
+            render();
+            mostraNotifica('Gioco eliminato!');
         });
-        inputTitolo.focus();
-    })
-    const elimina = document.createElement('button');
-    elimina.textContent = 'Elimina';
-    elimina.classList.add('eliminaBtn');
-    elimina.addEventListener('click', () => {
-        const btnElimina = giochi.indexOf(gioco);
-        giochi.splice(btnElimina, 1);
-        render();
+        //append
+        card.appendChild(elimina);
+        card.appendChild(modifica);
+        card.appendChild(statoGioco);
+        card.appendChild(badge);
+        card.appendChild(titolo);
+        card.appendChild(sottoTitolo);
+        lista.appendChild(card);
     });
-    //append
-    card.appendChild(elimina);
-    card.appendChild(modifica);
-    card.appendChild(statoGioco);
-    card.appendChild(badge);
-    card.appendChild(titolo);
-    card.appendChild(sottoTitolo);
-    lista.appendChild(card);
-});
 }
 
+function mostraNotifica(testo) {
 
+    notifica.textContent = testo;
+
+    notifica.style.display = 'block';
+
+    setTimeout(() => {
+        notifica.style.display = 'none';
+    }, 3000);
+}
 
 
 
@@ -222,29 +251,6 @@ giochiFiltrati.forEach((gioco) => {
    Altrimenti push allo stato, form.reset(), render().
    Id univoco con Date.now().
 */
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-
-
-/* INTERAZIONI BASE — eliminare, modificare, contare
-   - Elimina: filter per id, render(). Event delegation sul container.
-   - Modifica in-place: button "Modifica". Al click il testo diventa <input>,
-     si conferma con Invio o blur.
-   - Conteggi dinamici dentro render().
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-
-
-/* RICERCA, FILTRO, ORDINAMENTO
-   - Ricerca live: <input> con event "input". Salva in stato e render().
-   - Filtro: <select> con event "change". Salva in stato e render().
-   - Ordinamento: due button (o select). Salva in stato e render().
-   I tre si compongono dentro render() in fila.
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-
 
 /* NOTIFICHE TEMPORANEE
    Funzione notifica(testo) che imposta il testo del <div id="notifica">,
@@ -262,55 +268,4 @@ giochiFiltrati.forEach((gioco) => {
 /* SCRIVI QUI LA TUA RISPOSTA */
 
 
-/* PERSISTENZA — localStorage (cerca tu su MDN)
-   - In fondo a render(), salva lo stato:
-       localStorage.setItem("dati", JSON.stringify(stato));
-   - All'avvio, prima della prima render(), carica:
-       const salvato = localStorage.getItem("dati");
-       if (salvato) stato = JSON.parse(salvato);
-*/
 
-/* SCRIVI QUI LA TUA RISPOSTA */
-
-
-/* RIORDINO ↑ ↓
-   Due button su ogni elemento. Click su ↑ scambia con il precedente nell'array,
-   ↓ con il successivo. Event delegation. Poi render().
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-
-
-/* ESPORTAZIONE / IMPORTAZIONE JSON (cerca tu su MDN)
-   - Esporta: crea un Blob con JSON.stringify(stato), genera un URL con
-     URL.createObjectURL e simula il click su un <a download>.
-   - Importa: <input type="file"> + FileReader per leggere il contenuto come
-     testo, JSON.parse, sostituisci lo stato, render().
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-
-
-/* STATISTICHE GRAFICHE
-   Almeno due indicatori: contatori grandi e/o barre orizzontali
-   (<div> con width: X% in base al dato). Aggiorna dentro render().
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-
-
-/* MULTI-VISTA — lista / card / tabella
-   Una variabile globale "vista" che render() legge per decidere quale HTML
-   produrre. Tre button cambiano "vista" e chiamano render().
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */
-
-
-/* CATEGORIE
-   Aggiungi un campo categoria nello schema. Nel form un <select> per sceglierla.
-   In render(), raggruppa con reduce in { categoria: [elementi] } e disegna un
-   header per categoria con sotto la lista di quella categoria.
-*/
-
-/* SCRIVI QUI LA TUA RISPOSTA */

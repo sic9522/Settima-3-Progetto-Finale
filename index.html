@@ -18,13 +18,16 @@
     </header>
     <main>
         <div class="aggiungi" id="aggiungi">
+            <div class="titoloForm">
             <h2>Aggiungi un gioco</h2>
-            <form>
-                <input type="text" placeholder="Titolo gioco" id="titoloGioco" required>
-                <input type="text" placeholder="Produttore" id="produttore" required>
-                <input type="text" placeholder="Genere" id="genere" required>
+            <span id="errorForm"></span>
+            </div>
+            <form  id="formGioco">
+                <input type="text" placeholder="Titolo gioco" id="titoloGioco">
+                <input type="text" placeholder="Produttore" id="produttore">
+                <input type="text" placeholder="Genere" id="genere">
                 <select name="select" id="stato">
-                    <option value="Nuovo Gioco">Nuovo gioco</option>
+                    <option value="Nuovo gioco">Nuovo gioco</option>
                     <option value="giocato">Giocato</option>
                     <option value="daGiocare">Da giocare</option>
                 </select>
@@ -33,7 +36,7 @@
         </div>
         <div class="cerca" id="cerca">
             <form>
-                <input type="text" id="cerca" placeholder="Cerca per titolo o produttore">
+                <input type="text" id="ricerca" placeholder="Cerca per titolo o produttore">
                 <select name="stato" id="filtroStato">
                     <option value="Tutti">Tutti</option>
                     <option value="Da giocare">Da giocare</option>
@@ -58,12 +61,17 @@
             </div>
             <div>
                 <h2 id="daGiocare">0</h2>
-                <p>daGiocare/p>
+                <p>Da giocare</p>
             </div>
+
+            <div class="progressContainer">
+                <div class="progressBar" id="progressBar"></div>
+            </div>
+            <p id="percentualeTesto"></p>
         </div>
-        <div class="progressBar" id="progressBar"></div>
-        </div>
+        
         <div class="lista" id="lista"></div>
+        <div id="notifica"></div>
     </main>
 
 
