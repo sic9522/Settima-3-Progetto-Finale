@@ -400,10 +400,22 @@ form {
 }
 
 /*notifica*/ 
+.darkMode #notifica {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: black;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
 #notifica {
     display: none;
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
     background-color: #d4a017;
     color: white;
@@ -418,4 +430,13 @@ form {
     margin-left: 30px;
     font-size: 1.2em;
     font-weight: bold;
+}
+
+/*footer*/
+
+footer {
+    text-align: center;
+    height: 60px;
+    vertical-align: middle;
+    font-size: 25px;
 }
