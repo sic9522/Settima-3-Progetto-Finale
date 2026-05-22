@@ -10,26 +10,60 @@
 
 <body>
     <header>
-        <div class="inizio">
+        <div class="inizio" id="inizio">
             <h1>I miei Giochi</h1>
             <p>Aggiungi i giochi a cui hai giocato o vorresti giocare</p>
+            <button id="darkModeBtn">Dark Mode</button>
         </div>
     </header>
     <main>
-        <div class="aggiungi">
+        <div class="aggiungi" id="aggiungi">
             <h2>Aggiungi un gioco</h2>
             <form>
-                <input type="text" placeholder="Titolo gioco" id="titoloGioco">
-                <input type="text" placeholder="Produttore" id="produttore">
-                <input type="text" placeholder="Genere" id="genere">
-                <select name="" id="">
-                    <option value="nuoviGiochi">Nuovi giochi</option>
+                <input type="text" placeholder="Titolo gioco" id="titoloGioco" required>
+                <input type="text" placeholder="Produttore" id="produttore" required>
+                <input type="text" placeholder="Genere" id="genere" required>
+                <select name="select" id="stato">
+                    <option value="Nuovo Gioco">Nuovo gioco</option>
                     <option value="giocato">Giocato</option>
                     <option value="daGiocare">Da giocare</option>
                 </select>
                 <button type="submit">Aggiungi</button>
             </form>
         </div>
+        <div class="cerca" id="cerca">
+            <form>
+                <input type="text" id="cerca" placeholder="Cerca per titolo o produttore">
+                <select name="stato" id="filtroStato">
+                    <option value="Tutti">Tutti</option>
+                    <option value="Da giocare">Da giocare</option>
+                    <option value="Giocato">Giocato</option>
+                </select>
+                <select name="ordine" id="filtroOrdine">
+                    <option value="genere">Genere</option>
+                    <option value="produttore">Produttore</option>
+                    <option value="a-z">Ordine da A-Z</option>
+                    <option value="z-a">Ordine da Z-A</option>
+                </select>
+            </form>
+        </div>
+        <div class="contatore" id="contatore">
+            <div>
+                <h2 id="totale">0</h2>
+                <p>Totale</p>
+            </div>
+            <div>
+                <h2 id="giocati">0</h2>
+                <p>giocati</p>
+            </div>
+            <div>
+                <h2 id="daGiocare">0</h2>
+                <p>daGiocare/p>
+            </div>
+        </div>
+        <div class="progressBar" id="progressBar"></div>
+        </div>
+        <div class="lista" id="lista"></div>
     </main>
 
 
